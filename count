@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Subscriber Count</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #282c34;
+            color: white;
+            font-family: Arial, sans-serif;
+        }
+        #subscriberCount {
+            font-size: 4em;
+            margin: 20px;
+        }
+        .party {
+            display: none;
+            font-size: 2em;
+            color: gold;
+        }
+    </style>
+</head>
+<body>
+    <h1>Live Subscriber Count for Selfishan</h1>
+    <div id="subscriberCount">Loading...</div>
+    <div id="party" class="party">🎉 Party Time! 🎉</div>
+
+    <script>
+        const channelID = "UCblXMMs-Y71pMxyukM3h6UA"; // Replace with your channel ID
+        const subscriberCountElement = document.getElementById("subscriberCount");
+        const partyElement = document.getElementById("party");
+
+        async function fetchSubscriberCount() {
+            const response = await fetch(`https://www.googleapis.com/youtube/v3/channels?part=statistics&id=${channelID}&key=YOUR_API_KEY`);
+            const data = await response.json();
+            const subscriberCount = data.items[0].statistics.subscriberCount;
+            return subscriberCount;
+        }
+
+        async function updateCount() {
+            const count = await fetchSubscriberCount();
+            subscriberCountElement.textContent = count;
+            partyElement.style.display = 'none'; // Hide party initially
+
+            // Check if the count is updated
+            setInterval(async () => {
+                const newCount = await fetchSubscriberCount();
+                if (newCount > count) {
+                    partyElement.style.display = 'block'; // Show party when count increases
+                    setTimeout(() => {
+                        partyElement.style.display = 'none'; // Hide after 3 seconds
+                    }, 3000);
+                }
+                subscriberCountElement.textContent = newCount;
+                count = newCount;
+            }, 10000); // Check every 10 seconds
+        }
+
+        updateCount();
+    </script>
+</body>
+</html>
